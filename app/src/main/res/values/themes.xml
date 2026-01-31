@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.ThorLauncher" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.ThorLauncher.AppCompat" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="Theme.AynThorLauncher.SecondaryDebug" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">#FF00FF</item>
+    </style>
 </resources>
