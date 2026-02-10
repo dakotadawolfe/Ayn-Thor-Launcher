@@ -1,8 +1,6 @@
 package com.launcher.aynthords
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -27,13 +25,9 @@ class SecondaryHomeActivity : ComponentActivity() {
     private fun showLaunchMenu(label: String, intent: Intent) {
         android.app.AlertDialog.Builder(this)
             .setTitle("Launch $label on…")
-            .setItems(arrayOf("Top (0)", "Bottom (4)")) { _, which ->
-                val displayId = if (which == 0)
-                    DisplayAppLauncher.DISPLAY_TOP
-                else
-                    DisplayAppLauncher.DISPLAY_BOTTOM
-
-                DisplayAppLauncher.launchOnDisplay(this, intent, displayId)
+            .setItems(arrayOf("Interaction", "Presentation")) { _, which ->
+                val role = if (which == 0) DisplayRole.INTERACTION else DisplayRole.PRESENTATION
+                DisplayAppLauncher.launchOnRole(this, intent, role)
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -54,15 +48,11 @@ class SecondaryHomeActivity : ComponentActivity() {
         if (event.action == KeyEvent.ACTION_DOWN) {
             android.util.Log.d("Keys", "display=${display?.displayId} code=${event.keyCode} name=${KeyEvent.keyCodeToString(event.keyCode)}")
             if (event.keyCode == KeyEvent.KEYCODE_BUTTON_X) {
-                swapScreens()
+                swapDisplayRoleMappings()
                 return true
             }
         }
         return super.dispatchKeyEvent(event)
     }
 
-    private fun swapScreens() {
-        // TODO: Implement screen swapping logic
-        android.util.Log.d("Keys", "swapScreens() called")
-    }
 }
