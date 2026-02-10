@@ -74,7 +74,7 @@ class PrimaryHomeActivity : ComponentActivity() {
         if (event.action == KeyEvent.ACTION_DOWN) {
             android.util.Log.d("Keys", "display=${display?.displayId} code=${event.keyCode} name=${KeyEvent.keyCodeToString(event.keyCode)}")
             if (event.keyCode == KeyEvent.KEYCODE_BUTTON_X) {
-                swapScreens()
+                swapDisplayRoleMappings()
                 return true
             }
         }
@@ -173,28 +173,32 @@ fun LaunchTestPanel(
     if (showDialog && pendingIntent != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
+            title = { Text("Launch ${pendingLabel} on…") },
+            text = { Text("Choose the logical display role for HOME testing.") },
             title = { Text("Launch $pendingLabel on…") },
             text = { Text("Choose the display to launch on for HOME testing.") },
             confirmButton = {
                 TextButton(onClick = {
-                    DisplayAppLauncher.launchOnDisplay(
+                    DisplayAppLauncher.launchOnRole(
                         activity,
                         pendingIntent!!,
+                        DisplayRole.INTERACTION
                         DisplayAppLauncher.DISPLAY_TOP,
                     )
                     showDialog = false
-                }) { Text("Top (0)") }
+                }) { Text("Interaction") }
             },
             dismissButton = {
                 Row {
                     TextButton(onClick = {
-                        DisplayAppLauncher.launchOnDisplay(
+                        DisplayAppLauncher.launchOnRole(
                             activity,
                             pendingIntent!!,
+                            DisplayRole.PRESENTATION
                             DisplayAppLauncher.DISPLAY_BOTTOM,
                         )
                         showDialog = false
-                    }) { Text("Bottom (4)") }
+                    }) { Text("Presentation") }
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = { showDialog = false }) { Text("Cancel") }
                 }
