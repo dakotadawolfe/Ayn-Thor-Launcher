@@ -12,7 +12,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity=""
-            android:theme="@style/Theme.ThorLauncher.AppCompat">
+            android:theme="@style/Theme.ThorLauncher">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
@@ -28,7 +28,7 @@
             android:resizeableActivity="true"
             android:taskAffinity="com.launcher.aynthords.secondary"
             android:exported="true"
-            android:theme="@style/Theme.AynThorLauncher.SecondaryDebug">
+            android:theme="@style/Theme.ThorLauncher">
 
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MAIN" />

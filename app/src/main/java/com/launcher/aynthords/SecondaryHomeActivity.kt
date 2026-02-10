@@ -1,48 +1,29 @@
 package com.launcher.aynthords
 
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
-import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.launcher.aynthords.ui.theme.ThorLauncherTheme
 
 class SecondaryHomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_secondary_home)
-
-        findViewById<View>(R.id.btnSettings).setOnClickListener {
-            showLaunchMenu("Settings", DisplayAppLauncher.intentForSettings())
-        }
-
-        findViewById<View>(R.id.btnYouTube).setOnClickListener {
-            showLaunchMenu("YouTube", DisplayAppLauncher.intentForYouTube(this))
-        }
-    }
-
-    private fun showLaunchMenu(label: String, intent: Intent) {
-        android.app.AlertDialog.Builder(this)
-            .setTitle("Launch $label on…")
-            .setItems(arrayOf("Top (0)", "Bottom (4)")) { _, which ->
-                val displayId = if (which == 0)
-                    DisplayAppLauncher.DISPLAY_TOP
-                else
-                    DisplayAppLauncher.DISPLAY_BOTTOM
-
-                DisplayAppLauncher.launchOnDisplay(this, intent, displayId)
+        setContent {
+            ThorLauncherTheme {
+                RoleHomeSurface(
+                    activity = this,
+                    role = HomeRole.PRESENTATION_SHELL,
+                )
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
     }
 
-    override fun onNewIntent(intent: Intent) {
+    override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Optional: log or ignore. This is basically “HOME was pressed again”.
     }
 
     override fun onResume() {
