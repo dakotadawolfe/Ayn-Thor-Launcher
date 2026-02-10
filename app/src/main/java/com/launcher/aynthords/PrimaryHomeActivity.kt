@@ -29,6 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.launcher.aynthords.theme.ThemeRepository
+import com.launcher.aynthords.ui.theme.ThorLauncherTheme
+import com.launcher.aynthords.ui.theme.ThorTheme
 import com.launcher.aynthords.display.ChangeSource
 import com.launcher.aynthords.display.DisplayRoleState
 import com.launcher.aynthords.display.DisplayRoleStore
@@ -45,7 +48,11 @@ class PrimaryHomeActivity : ComponentActivity() {
         ensureSecondaryDisplayActivity()
         DisplayRoleStore.reportDisplayValidation(display?.displayId, ChangeSource.STARTUP)
 
+        val activeTheme = ThemeRepository.loadBestTheme(this)
         setContent {
+            ThorLauncherTheme(themeSpec = activeTheme.spec) {
+                LaunchTestPanel(activity = this)
+            }
             val state by DisplayRoleStore.state.collectAsState()
             val role = DisplayRoleStore.roleForDisplayId(display?.displayId)
             LaunchTestPanel(activity = this, role = role, state = state)
@@ -99,6 +106,8 @@ class PrimaryHomeActivity : ComponentActivity() {
 }
 
 @Composable
+fun LaunchTestPanel(activity: android.app.Activity) {
+    val interactionLayout = ThorTheme.layout.interaction
 fun LaunchTestPanel(
     activity: android.app.Activity,
     role: SurfaceRole?,
@@ -123,6 +132,9 @@ fun LaunchTestPanel(
     }
 
     Column(
+        modifier = Modifier.fillMaxSize().padding(interactionLayout.paddingDp.dp),
+        verticalArrangement = Arrangement.spacedBy(interactionLayout.spacingDp.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
@@ -198,6 +210,8 @@ fun LaunchTestPanel(
                             DisplayAppLauncher.DISPLAY_BOTTOM,
                         )
                         showDialog = false
+                    }) { Text("Bottom (4)") }
+                    Spacer(Modifier.width(interactionLayout.spacingDp.dp))
                     }) { Text("Presentation") }
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = { showDialog = false }) { Text("Cancel") }
