@@ -5,14 +5,38 @@
     android:layout_height="match_parent"
     android:background="#00FFFF">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SECONDARY HOME"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SECONDARY HOME"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Role: UNKNOWN"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtValidation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Validation"
+            android:textColor="#000000" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
