@@ -1,20 +1,8 @@
 package com.launcher.aynthords
 
+import com.launcher.aynthords.display.DisplayRoleStore
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
-/**
- * Shared in-process state: which display should be "white".
- * If true: primary=white, secondary=black.
- * If false: primary=black, secondary=white.
- */
+@Deprecated("Use DisplayRoleStore for typed role state")
 object ScreenSwapState {
-    private val _primaryIsWhite = MutableStateFlow(true)
-    val primaryIsWhite: StateFlow<Boolean> = _primaryIsWhite.asStateFlow()
-
-    fun toggle() {
-        _primaryIsWhite.value = !_primaryIsWhite.value
-    }
+    val state = DisplayRoleStore.state
 }
