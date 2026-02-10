@@ -23,6 +23,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.launcher.aynthords.theme.ThemeRepository
+import com.launcher.aynthords.ui.theme.ThorLauncherTheme
+import com.launcher.aynthords.ui.theme.ThorTheme
 
 class PrimaryHomeActivity : ComponentActivity() {
 
@@ -32,8 +35,11 @@ class PrimaryHomeActivity : ComponentActivity() {
         // On any entry to "home", make sure we own the other screen too.
         ensureSecondaryDisplayActivity()
 
+        val activeTheme = ThemeRepository.loadBestTheme(this)
         setContent {
-            LaunchTestPanel(activity = this)
+            ThorLauncherTheme(themeSpec = activeTheme.spec) {
+                LaunchTestPanel(activity = this)
+            }
         }
     }
 
@@ -56,6 +62,7 @@ class PrimaryHomeActivity : ComponentActivity() {
 
 @Composable
 fun LaunchTestPanel(activity: android.app.Activity) {
+    val interactionLayout = ThorTheme.layout.interaction
     var showDialog by remember { mutableStateOf(false) }
     var pendingIntent by remember { mutableStateOf<android.content.Intent?>(null) }
     var pendingLabel by remember { mutableStateOf("") }
@@ -67,8 +74,8 @@ fun LaunchTestPanel(activity: android.app.Activity) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        modifier = Modifier.fillMaxSize().padding(interactionLayout.paddingDp.dp),
+        verticalArrangement = Arrangement.spacedBy(interactionLayout.spacingDp.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = {
@@ -105,7 +112,7 @@ fun LaunchTestPanel(activity: android.app.Activity) {
                         )
                         showDialog = false
                     }) { Text("Bottom (4)") }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(interactionLayout.spacingDp.dp))
                     TextButton(onClick = { showDialog = false }) { Text("Cancel") }
                 }
             }
