@@ -5,7 +5,11 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:supportsRtl="true">
 
-        <!-- Primary launcher (default display HOME) -->
+        <!--
+          Threat model: this entry point is intentionally exported because the system resolver
+          must be able to launch it as the default HOME activity. Keep the intent filter minimal
+          (MAIN + HOME only) so this activity is not advertised as a generic launcher target.
+        -->
         <activity
             android:name=".PrimaryHomeActivity"
             android:exported="true"
@@ -16,11 +20,13 @@
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!--
+          Threat model: secondary-home is exported for system-managed multi-display home flows.
+          Restrict categories to SECONDARY_HOME only; no generic DEFAULT routing.
+        -->
         <activity
             android:name=".SecondaryHomeActivity"
             android:launchMode="singleTop"
@@ -33,11 +39,20 @@
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.SECONDARY_HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".OdinKeyReceiver" android:exported="true">
+        <!--
+          Threat model: remains exported only for framework media-button delivery.
+          Guard with MEDIA_CONTENT_CONTROL so arbitrary third-party apps cannot inject
+          media-button broadcasts into this receiver.
+          TODO(security): migrate to in-app key handling (e.g., MediaSession callback) and set
+          exported=false once framework broadcast dependency is removed.
+        -->
+        <receiver
+            android:name=".OdinKeyReceiver"
+            android:exported="true"
+            android:permission="android.permission.MEDIA_CONTENT_CONTROL">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

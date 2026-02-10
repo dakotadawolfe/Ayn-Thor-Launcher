@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +36,9 @@ import com.launcher.aynthords.display.SurfaceRole
 
 class PrimaryHomeActivity : ComponentActivity() {
 
+    private val sessionController by lazy { DualScreenSessionController(this) }
+    private val recoveryMessage = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,7 +49,20 @@ class PrimaryHomeActivity : ComponentActivity() {
             val state by DisplayRoleStore.state.collectAsState()
             val role = DisplayRoleStore.roleForDisplayId(display?.displayId)
             LaunchTestPanel(activity = this, role = role, state = state)
+        setContent {
+            LaunchTestPanel(
+                activity = this,
+                recoveryMessage = recoveryMessage.value,
+                onRetryRecovery = { reassertDualScreenSession() }
+            )
         }
+
+        reassertDualScreenSession()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reassertDualScreenSession()
     }
 
     override fun onResume() {
@@ -62,6 +81,15 @@ class PrimaryHomeActivity : ComponentActivity() {
         return super.dispatchKeyEvent(event)
     }
 
+    private fun reassertDualScreenSession() {
+        val result = sessionController.reassert()
+        recoveryMessage.value = when (result.status) {
+            DualScreenSessionController.Status.HEALTHY -> null
+            DualScreenSessionController.Status.RECOVERED,
+            DualScreenSessionController.Status.ERROR -> result.message
+        }
+    }
+
     private fun swapScreens() {
         DisplayRoleStore.swapScreens(
             source = ChangeSource.USER_SWAP,
@@ -75,6 +103,8 @@ fun LaunchTestPanel(
     activity: android.app.Activity,
     role: SurfaceRole?,
     state: DisplayRoleState,
+    recoveryMessage: String?,
+    onRetryRecovery: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var pendingIntent by remember { mutableStateOf<android.content.Intent?>(null) }
@@ -104,6 +134,32 @@ fun LaunchTestPanel(
         Text("Role: ${role ?: "UNKNOWN"}")
         Text("Source: ${state.sourceOfChange}")
         Text("Validation top=${state.validation.top}, bottom=${state.validation.bottom}")
+        if (recoveryMessage != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Dual-screen recovery required",
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = recoveryMessage,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Button(onClick = onRetryRecovery) {
+                        Text("Retry secondary launch")
+                    }
+                }
+            }
+        }
 
         Button(onClick = {
             promptLaunch("Settings", DisplayAppLauncher.intentForSettings())
