@@ -20,9 +20,12 @@ class HomeActivity : AppCompatActivity() {
         view.setBackgroundColor(Color.WHITE)
         setContentView(view)
 
-        // When a user taps this screen, we'll swap the colors.
         view.setOnClickListener {
-            // TODO: Implement screen swapping logic
+            swapDisplayRoleMappings()
+            com.launcher.aynthords.display.DisplayRoleStore.swapScreens(
+                source = com.launcher.aynthords.display.ChangeSource.USER_SWAP,
+                displayId = display?.displayId,
+            )
         }
 
         // Also launch on create to be more assertive

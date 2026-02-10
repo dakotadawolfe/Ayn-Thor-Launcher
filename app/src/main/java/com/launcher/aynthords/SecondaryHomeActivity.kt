@@ -101,16 +101,14 @@ class SecondaryHomeActivity : ComponentActivity() {
             android.util.Log.d("Keys", "display=${display?.displayId} code=${event.keyCode} name=${KeyEvent.keyCodeToString(event.keyCode)}")
             if (event.keyCode == KeyEvent.KEYCODE_BUTTON_X) {
                 swapDisplayRoleMappings()
+                DisplayRoleStore.swapScreens(
+                    source = ChangeSource.USER_SWAP,
+                    displayId = display?.displayId,
+                )
                 return true
             }
         }
         return super.dispatchKeyEvent(event)
     }
 
-    private fun swapScreens() {
-        DisplayRoleStore.swapScreens(
-            source = ChangeSource.USER_SWAP,
-            displayId = display?.displayId,
-        )
-    }
 }

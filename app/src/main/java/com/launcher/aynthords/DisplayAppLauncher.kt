@@ -7,6 +7,9 @@ import android.net.Uri
 import android.provider.Settings
 
 object DisplayAppLauncher {
+    const val DISPLAY_TOP = 0
+    const val DISPLAY_BOTTOM = 4
+
     fun intentForSettings(): Intent =
         Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
