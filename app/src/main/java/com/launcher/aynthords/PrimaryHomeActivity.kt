@@ -20,13 +20,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.launcher.aynthords.display.ChangeSource
+import com.launcher.aynthords.display.DisplayRoleState
+import com.launcher.aynthords.display.DisplayRoleStore
+import com.launcher.aynthords.display.SurfaceRole
 
 class PrimaryHomeActivity : ComponentActivity() {
 
@@ -36,6 +42,13 @@ class PrimaryHomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        ensureSecondaryDisplayActivity()
+        DisplayRoleStore.reportDisplayValidation(display?.displayId, ChangeSource.STARTUP)
+
+        setContent {
+            val state by DisplayRoleStore.state.collectAsState()
+            val role = DisplayRoleStore.roleForDisplayId(display?.displayId)
+            LaunchTestPanel(activity = this, role = role, state = state)
         setContent {
             LaunchTestPanel(
                 activity = this,
@@ -50,6 +63,11 @@ class PrimaryHomeActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         reassertDualScreenSession()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        DisplayRoleStore.reportDisplayValidation(display?.displayId, ChangeSource.RECOVERY)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
@@ -73,14 +91,18 @@ class PrimaryHomeActivity : ComponentActivity() {
     }
 
     private fun swapScreens() {
-        // TODO: Implement screen swapping logic
-        android.util.Log.d("Keys", "swapScreens() called")
+        DisplayRoleStore.swapScreens(
+            source = ChangeSource.USER_SWAP,
+            displayId = display?.displayId,
+        )
     }
 }
 
 @Composable
 fun LaunchTestPanel(
     activity: android.app.Activity,
+    role: SurfaceRole?,
+    state: DisplayRoleState,
     recoveryMessage: String?,
     onRetryRecovery: () -> Unit
 ) {
@@ -94,11 +116,24 @@ fun LaunchTestPanel(
         showDialog = true
     }
 
+    val backgroundColor = when (role) {
+        SurfaceRole.INTERACTION -> Color(0xFF0D47A1)
+        SurfaceRole.PRESENTATION -> Color(0xFF004D40)
+        null -> Color.DarkGray
+    }
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text("PRIMARY HOME")
+        Text("Role: ${role ?: "UNKNOWN"}")
+        Text("Source: ${state.sourceOfChange}")
+        Text("Validation top=${state.validation.top}, bottom=${state.validation.bottom}")
         if (recoveryMessage != null) {
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -138,14 +173,14 @@ fun LaunchTestPanel(
     if (showDialog && pendingIntent != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Launch ${pendingLabel} on…") },
+            title = { Text("Launch $pendingLabel on…") },
             text = { Text("Choose the display to launch on for HOME testing.") },
             confirmButton = {
                 TextButton(onClick = {
                     DisplayAppLauncher.launchOnDisplay(
                         activity,
                         pendingIntent!!,
-                        DisplayAppLauncher.DISPLAY_TOP
+                        DisplayAppLauncher.DISPLAY_TOP,
                     )
                     showDialog = false
                 }) { Text("Top (0)") }
@@ -156,14 +191,14 @@ fun LaunchTestPanel(
                         DisplayAppLauncher.launchOnDisplay(
                             activity,
                             pendingIntent!!,
-                            DisplayAppLauncher.DISPLAY_BOTTOM
+                            DisplayAppLauncher.DISPLAY_BOTTOM,
                         )
                         showDialog = false
                     }) { Text("Bottom (4)") }
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = { showDialog = false }) { Text("Cancel") }
                 }
-            }
+            },
         )
     }
 }
