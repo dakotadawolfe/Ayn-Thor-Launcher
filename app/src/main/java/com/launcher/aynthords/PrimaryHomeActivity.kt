@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,15 +30,26 @@ import androidx.compose.ui.unit.dp
 
 class PrimaryHomeActivity : ComponentActivity() {
 
+    private val sessionController by lazy { DualScreenSessionController(this) }
+    private val recoveryMessage = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // On any entry to "home", make sure we own the other screen too.
-        ensureSecondaryDisplayActivity()
-
         setContent {
-            LaunchTestPanel(activity = this)
+            LaunchTestPanel(
+                activity = this,
+                recoveryMessage = recoveryMessage.value,
+                onRetryRecovery = { reassertDualScreenSession() }
+            )
         }
+
+        reassertDualScreenSession()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reassertDualScreenSession()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
@@ -48,6 +63,15 @@ class PrimaryHomeActivity : ComponentActivity() {
         return super.dispatchKeyEvent(event)
     }
 
+    private fun reassertDualScreenSession() {
+        val result = sessionController.reassert()
+        recoveryMessage.value = when (result.status) {
+            DualScreenSessionController.Status.HEALTHY -> null
+            DualScreenSessionController.Status.RECOVERED,
+            DualScreenSessionController.Status.ERROR -> result.message
+        }
+    }
+
     private fun swapScreens() {
         // TODO: Implement screen swapping logic
         android.util.Log.d("Keys", "swapScreens() called")
@@ -55,7 +79,11 @@ class PrimaryHomeActivity : ComponentActivity() {
 }
 
 @Composable
-fun LaunchTestPanel(activity: android.app.Activity) {
+fun LaunchTestPanel(
+    activity: android.app.Activity,
+    recoveryMessage: String?,
+    onRetryRecovery: () -> Unit
+) {
     var showDialog by remember { mutableStateOf(false) }
     var pendingIntent by remember { mutableStateOf<android.content.Intent?>(null) }
     var pendingLabel by remember { mutableStateOf("") }
@@ -71,6 +99,33 @@ fun LaunchTestPanel(activity: android.app.Activity) {
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (recoveryMessage != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Dual-screen recovery required",
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = recoveryMessage,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Button(onClick = onRetryRecovery) {
+                        Text("Retry secondary launch")
+                    }
+                }
+            }
+        }
+
         Button(onClick = {
             promptLaunch("Settings", DisplayAppLauncher.intentForSettings())
         }) { Text("Launch Settings") }
