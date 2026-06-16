@@ -141,3 +141,7 @@ gradlew.bat connectedAndroidTest
 - Prefer deterministic recovery flows over silent Android fallback behavior.
 - Treat `PROJECT_SPEC.md` and `InteractionContract.md` as design constraints.
 - If a secondary display is missing or blank, inspect display registry and session-controller logs before changing UI layout.
+
+## License
+
+GPL-3.0. See `LICENSE`.
