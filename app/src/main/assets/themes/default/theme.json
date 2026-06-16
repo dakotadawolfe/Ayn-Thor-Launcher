@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Default",
+    "version": "1.0",
+    "author": "Ayn"
+  },
+  "palette": {
+    "primary": "#FFB74D",
+    "surface": "#FF121212",
+    "onSurface": "#FFFFFFFF",
+    "surfaceVariant": "#FF2D2D2D",
+    "onSurfaceVariant": "#FFB0B0B0"
+  },
+  "typography": {
+    "default": "default"
+  },
+  "motion": {
+    "duration": 300
+  },
+  "layout": {
+    "spacing": 16,
+    "cornerRadius": 8
+  }
+}

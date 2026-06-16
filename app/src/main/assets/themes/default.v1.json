@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Thor Launcher Default",
+    "version": "1.0.0",
+    "author": "AynThor",
+    "compatibility": {
+      "minSdk": 31,
+      "minAppVersion": "1.0.0"
+    }
+  },
+  "palette": {
+    "light": {
+      "primary": "#6650A4",
+      "onPrimary": "#FFFFFF",
+      "secondary": "#625B71",
+      "onSecondary": "#FFFFFF",
+      "tertiary": "#7D5260",
+      "onTertiary": "#FFFFFF",
+      "background": "#FFFBFE",
+      "onBackground": "#1C1B1F",
+      "surface": "#FFFBFE",
+      "onSurface": "#1C1B1F"
+    },
+    "dark": {
+      "primary": "#D0BCFF",
+      "onPrimary": "#381E72",
+      "secondary": "#CCC2DC",
+      "onSecondary": "#332D41",
+      "tertiary": "#EFB8C8",
+      "onTertiary": "#492532",
+      "background": "#1C1B1F",
+      "onBackground": "#E6E1E5",
+      "surface": "#1C1B1F",
+      "onSurface": "#E6E1E5"
+    }
+  },
+  "typography": {
+    "bodyLarge": {
+      "fontSizeSp": 16,
+      "lineHeightSp": 24,
+      "letterSpacingSp": 0.5,
+      "fontWeight": 400
+    },
+    "titleLarge": {
+      "fontSizeSp": 22,
+      "lineHeightSp": 28,
+      "letterSpacingSp": 0,
+      "fontWeight": 500
+    },
+    "labelSmall": {
+      "fontSizeSp": 11,
+      "lineHeightSp": 16,
+      "letterSpacingSp": 0.5,
+      "fontWeight": 500
+    }
+  },
+  "motion": {
+    "shortMs": 120,
+    "mediumMs": 220,
+    "longMs": 360,
+    "easing": "fastOutSlowIn"
+  },
+  "layout": {
+    "interaction": {
+      "paddingDp": 16,
+      "spacingDp": 12,
+      "cornerRadiusDp": 12
+    },
+    "presentation": {
+      "paddingDp": 20,
+      "spacingDp": 16,
+      "cornerRadiusDp": 0,
+      "maxWidthDp": 720
+    }
+  }
+}
